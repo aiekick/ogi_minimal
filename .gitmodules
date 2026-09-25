@@ -1,0 +1,3 @@
+[submodule "ogi"]
+	path = ogi
+	url = https://github.com/aiekick/ogi.git
