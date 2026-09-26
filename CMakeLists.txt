@@ -10,7 +10,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 set(BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 add_subdirectory(contrib)
-add_subdirectory(ogi)
+
+if (NOT TARGET ogi)
+    add_subdirectory(ogi)
+endif()
 
 if(WIN32)
     add_subdirectory(ogi_minimal_cpu_win32_gdi)
