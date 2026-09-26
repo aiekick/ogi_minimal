@@ -8,6 +8,7 @@
 #include <backends/ogi_opengl32.h>
 #include <backends/ogi_wgl.h>
 #include <backends/ogi_settings_file.h>
+#include <backends/ogi_nanovg.h>
 
 static ogi::CharID s_app_name{"ogi_minimal_gpu_win32_wgl"};
 
@@ -49,12 +50,9 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     }
     // THE GL PAIRING : the context is born on the window to the asked
     // version and profile, then the loader resolves the entry points on it
-    ogi::wgl::ContextDesc glContextDesc;
-    glContextDesc.coreProfile = true;
-    glContextDesc.majorVersion = 3;
-    glContextDesc.minorVersion = 3;
-    glContextDesc.swapInterval = 1;
-    if (!ogi::wgl::init(mainWindow, glContextDesc)) {
+    if (!ogi::wgl::init(
+            mainWindow,  //
+            ogi::wgl::ContextDesc(true, 3, 3, ogi::wgl::ContextDesc::SWAP_VSYNC))) {
         ogi::wgl::unit();
         return EXIT_FAILURE;
     }
@@ -66,6 +64,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     }
     ogi::wgl::PlatformApi platformApi;
     ogi::RendererGL glRenderer;
+    ogi::RendererNanoVg vgRenderer;
     platformApi.setWindowCreationEnabled(false);
     ogi::createContext();
     ogi::initDefaults();
@@ -78,8 +77,19 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         std::cout << "Fail to init win32 backend" << std::endl;
         return EXIT_FAILURE;
     }
-    if (!glRenderer.init(ogi::wgl::procAddress)) {
-        std::cout << "Fail to init renderer" << std::endl;
+    enum API { API_CORE = 1, API_NANOVG, ApiCount };
+    // register draw/skin api for nanovg. 0 is the core
+    ogi::setSkinApi(new ogi::SkinApiCore, API_CORE);
+    ogi::setDrawApi(new ogi::DrawApiGPU, API_CORE);
+    if (!glRenderer.init(ogi::wgl::procAddress, false)) {
+        std::cout << "Fail to init GL renderer" << std::endl;
+        return EXIT_FAILURE;
+    }
+    // register draw/skin api for nanovg. 0 is the core
+    ogi::setSkinApi(new ogi::SkinApiVG, API_NANOVG);
+    ogi::setDrawApi(new ogi::DrawApiVG, API_NANOVG);
+    if (!vgRenderer.init(ogi::wgl::procAddress, false)) {
+        std::cout << "Fail to init NANOVG renderer" << std::endl;
         return EXIT_FAILURE;
     }
     initHwm();
@@ -90,6 +100,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     bool show_another_window{true};
     ogi::fvec4 clear_color{0.45f, 0.55f, 0.60f, 1.00f};
     bool m_quitRequested{false};
+    auto& ctx = *ogi::getCurrentContext();
     while (!m_quitRequested) {
         if (!ogi::win32::pumpMessages(ogi::hasPendingWork() ? 16 : 250)) {
             m_quitRequested = true;
@@ -134,8 +145,21 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
             }
             ogi::endWindow();
             if (show_another_window) {
-                if (ogi::beginWindow("Another Window", &show_another_window)) {
+                if (ogi::beginWindow("Another window", &show_another_window)) {
                     ogi::text("Hello from another window!");
+                    const auto& coreApi = ogi::getDrawApiFamilyId() == ogi::DrawApiGPU::familyId();
+                    ogi::beginLayoutHorizontal("rendering api");
+                    ogi::pushItemWidth(-1.0f);
+                    if (ogi::checkButton("Core", coreApi)) {
+                        ogi::setSkinApi(API_CORE);
+                        ogi::setDrawApi(API_CORE);
+                    }
+                    if (ogi::checkButton("NanoVg", !coreApi)) {
+                        ogi::setSkinApi(API_NANOVG);
+                        ogi::setDrawApi(API_NANOVG);
+                    }
+                    ogi::popItemWidth();
+                    ogi::endLayoutHorizontal();
                     if (ogi::button("Close Me")) {
                         show_another_window = false;
                     }
@@ -150,13 +174,19 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
             glViewport(0, 0, width, height);
             glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
-            glRenderer.render();  // consumes and clears the context draw api
+            // the renderer consumes and clears the context draw api
+            if (ogi::getDrawApiFamilyId() == ogi::DrawApiVG::familyId()) {
+                vgRenderer.render();
+            } else {
+                glRenderer.render();
+            }
             ogi::wgl::present(nullptr);
         }
         updateHwm(mainWindow);
     }
     ogi::saveSettings();
     glRenderer.unit();
+    vgRenderer.unit();
     ogi::win32::shutdown();
     ogi::wgl::unit();
     ogi::destroyContext();
