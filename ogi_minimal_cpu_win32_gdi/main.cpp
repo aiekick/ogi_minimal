@@ -64,7 +64,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         return EXIT_FAILURE;
     }
     gdiRenderer.setWindow(mainWindow);
-    if (!gdiRenderer.init()) {
+    if (!gdiRenderer.init(true)) {
         std::cout << "Fail to init renderer" << std::endl;
         return EXIT_FAILURE;
     }
