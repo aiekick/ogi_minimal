@@ -113,16 +113,24 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
             static int counter = 0;
             if (ogi::beginWindow("Hello, world!")) {
                 ogi::text("This is some useful text.");
+                ogi::beginLayoutHorizontal("h");
                 ogi::checkBox("Demo Window", &show_demo_window);
                 ogi::checkBox("Another Window", &show_another_window);
+                ogi::endLayoutHorizontal();
                 ogi::slider("float", &f, 0.0f, 1.0f);
                 ogi::colorEdit("clear color", &clear_color);
                 if (ogi::button("Button")) {
                     counter++;
                 }
                 ogi::sameRow();
+                // getHash is needed for have the same id for this widget since the text qui change frequently by interactions
                 ogi::text(ogi::getHash("counter"), ogi::format("counter = %d", counter));
-                ogi::text(ogi::getHash("framerate"), ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
+                static bool show_fps{false};
+                ogi::checkBox("show fps (cause a redraw each frames)", &show_fps);
+                if (show_fps) {
+                    // not need to use getHash here, since, the widget will be drawn each frame du to the io.deltaTime changes
+                    ogi::text(ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
+                }
             }
             ogi::endWindow();
             if (show_another_window) {
