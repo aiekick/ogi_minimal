@@ -3,9 +3,13 @@
 #include <iostream>
 
 #include <ogi.h>
-#include <backends/ogi_gdi.h>
 #include <backends/ogi_win32.h>
+#include <glad/glad.h>  // the loader of the app's own gl drawing
+#include <backends/ogi_opengl32.h>
+#include <backends/ogi_wgl.h>
 #include <backends/ogi_settings_file.h>
+
+static ogi::CharID s_app_name{"ogi_minimal_gpu_win32_wgl"};
 
 #include <ezHwm.hpp>
 struct Hwm {
@@ -14,7 +18,6 @@ struct Hwm {
     bool hasGpu{false};
     const char* title{nullptr};
 };
-static ogi::CharID s_app_name{"ogi_minimal_cpu_gdi"};
 static ez::hwm::Sampler::SamplerPtr sp_sampler;
 static Hwm s_hwMeasures;
 void initHwm() {
@@ -37,23 +40,37 @@ void updateHwm(const ogi::PlatformWindowHandle& aWindow) {
         }
     }
 }
-#include <windows.h>
 
 int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*a_cmd_line*/, int a_cmd_show) {
-    auto mainWindow = ogi::win32::createAppWindow("ogi gdi", 1280, 720);
+    auto mainWindow = ogi::win32::createAppWindow(s_app_name, 1280, 720);
     if (mainWindow == nullptr) {
         std::cout << "Fail to create the window" << std::endl;
         return EXIT_FAILURE;
     }
-    ogi::RendererGdi gdiRenderer;
-    ogi::win32::PlatformApi m_platformApi;
-    int32_t m_lastWidth{};
-    int32_t m_lastHeight{};
+    // THE GL PAIRING : the context is born on the window to the asked
+    // version and profile, then the loader resolves the entry points on it
+    ogi::wgl::ContextDesc glContextDesc;
+    glContextDesc.coreProfile = true;
+    glContextDesc.majorVersion = 3;
+    glContextDesc.minorVersion = 3;
+    glContextDesc.swapInterval = 1;
+    if (!ogi::wgl::init(mainWindow, glContextDesc)) {
+        ogi::wgl::unit();
+        return EXIT_FAILURE;
+    }
+    // the loader is the app's choice : glad here, fed by the pairing
+    if (gladLoadGLLoader(ogi::wgl::procAddress) == 0) {
+        std::cout << "Fail to load the gl entry points" << std::endl;
+        ogi::wgl::unit();
+        return EXIT_FAILURE;
+    }
+    ogi::wgl::PlatformApi platformApi;
+    ogi::RendererGL glRenderer;
+    platformApi.setWindowCreationEnabled(false);
     ogi::createContext();
     ogi::initDefaults();
     ogi::themeDarkOrangeBlue();
-    m_platformApi.setWindowCreationEnabled(false);
-    ogi::win32::setPlatformApi(&m_platformApi);
+    ogi::win32::setPlatformApi(&platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
     ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
     ogi::loadSettings();
@@ -61,14 +78,13 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         std::cout << "Fail to init win32 backend" << std::endl;
         return EXIT_FAILURE;
     }
-    gdiRenderer.setWindow(mainWindow);
-    if (!gdiRenderer.init()) {
+    if (!glRenderer.init(ogi::wgl::procAddress)) {
         std::cout << "Fail to init renderer" << std::endl;
         return EXIT_FAILURE;
     }
     initHwm();
-    static float f = 0.0f;
-    static int counter = 0;
+    int32_t m_lastWidth{};
+    int32_t m_lastHeight{};
     const auto& io = ogi::getIo();
     bool show_demo_window{true};
     bool show_another_window{true};
@@ -80,11 +96,11 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         }
         ogi::win32::newFrame();
         auto clientRect = ogi::win32::getWindowClientRect(mainWindow);
-        const auto w = static_cast<int32_t>(clientRect.size.x);
-        const auto h = static_cast<int32_t>(clientRect.size.y);
-        if (w != m_lastWidth || h != m_lastHeight) {
-            m_lastWidth = w;
-            m_lastHeight = h;
+        const auto width = static_cast<int32_t>(clientRect.size.x);
+        const auto height = static_cast<int32_t>(clientRect.size.y);
+        if (width != m_lastWidth || height != m_lastHeight) {
+            m_lastWidth = width;
+            m_lastHeight = height;
             ogi::requestFullRedraw();
         }
         ogi::newFrame();
@@ -93,6 +109,8 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
             if (show_demo_window) {
                 ogi::showDemoWindow(&show_demo_window);
             }
+            static float f = 0.0f;
+            static int counter = 0;
             if (ogi::beginWindow("Hello, world!")) {
                 ogi::text("This is some useful text.");
                 ogi::checkBox("Demo Window", &show_demo_window);
@@ -103,8 +121,8 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
                     counter++;
                 }
                 ogi::sameRow();
-                ogi::text(ogi::HashID("counter"), ogi::format("counter = %d", counter));
-                ogi::text(ogi::HashID("framerate"), ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
+                ogi::text(ogi::getHash("counter"), ogi::format("counter = %d", counter));
+                ogi::text(ogi::getHash("framerate"), ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
             }
             ogi::endWindow();
             if (show_another_window) {
@@ -120,15 +138,19 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         ogi::endViewport();
         ogi::render();
         if (ogi::hasPendingWork()) {
-            gdiRenderer.clearBackbuffer(clear_color);  // the "app scene"
-            gdiRenderer.render();                      // consumes and clears the context draw api
-            gdiRenderer.present();                     // BitBlt of the backbuffer to the window
+            ogi::wgl::makeCurrent(nullptr);  // nullptr = the main surface
+            glViewport(0, 0, width, height);
+            glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glRenderer.render();  // consumes and clears the context draw api
+            ogi::wgl::present(nullptr);
         }
         updateHwm(mainWindow);
     }
     ogi::saveSettings();
-    gdiRenderer.unit();
+    glRenderer.unit();
     ogi::win32::shutdown();
+    ogi::wgl::unit();
     ogi::destroyContext();
     return EXIT_SUCCESS;
 }
