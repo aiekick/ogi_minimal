@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
 
-set(BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+# not using CMAKE_CURENT_SOURCE_DIR for always have binaries in root bin folder
+set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(contrib)
 

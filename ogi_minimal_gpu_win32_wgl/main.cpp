@@ -79,15 +79,15 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     }
     enum API { API_CORE = 1, API_NANOVG, ApiCount };
     // register draw/skin api for nanovg. 0 is the core
-    ogi::setSkinApi(new ogi::SkinApiCore, API_CORE);
-    ogi::setDrawApi(new ogi::DrawApiGPU, API_CORE);
+    ogi::setSkinApi<ogi::SkinApiCore>(API_CORE);
+    ogi::setDrawApi<ogi::DrawApiGPU>(API_CORE);
     if (!glRenderer.init(ogi::wgl::procAddress, false)) {
         std::cout << "Fail to init GL renderer" << std::endl;
         return EXIT_FAILURE;
     }
     // register draw/skin api for nanovg. 0 is the core
-    ogi::setSkinApi(new ogi::SkinApiVG, API_NANOVG);
-    ogi::setDrawApi(new ogi::DrawApiVG, API_NANOVG);
+    ogi::setSkinApi<ogi::SkinApiVG>(API_NANOVG);
+    ogi::setDrawApi<ogi::DrawApiVG>(API_NANOVG);
     if (!vgRenderer.init(ogi::wgl::procAddress, false)) {
         std::cout << "Fail to init NANOVG renderer" << std::endl;
         return EXIT_FAILURE;
@@ -151,12 +151,12 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
                     ogi::beginLayoutHorizontal("rendering api");
                     ogi::pushItemWidth(-1.0f);
                     if (ogi::checkButton("Core", coreApi)) {
-                        ogi::setSkinApi(API_CORE);
-                        ogi::setDrawApi(API_CORE);
+                        ogi::selectSkinApi(API_CORE);
+                        ogi::selectDrawApi(API_CORE);
                     }
                     if (ogi::checkButton("NanoVg", !coreApi)) {
-                        ogi::setSkinApi(API_NANOVG);
-                        ogi::setDrawApi(API_NANOVG);
+                        ogi::selectSkinApi(API_NANOVG);
+                        ogi::selectDrawApi(API_NANOVG);
                     }
                     ogi::popItemWidth();
                     ogi::endLayoutHorizontal();
