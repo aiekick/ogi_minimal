@@ -93,8 +93,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         return EXIT_FAILURE;
     }
     initHwm();
-    int32_t m_lastWidth{};
-    int32_t m_lastHeight{};
+    ogi::frect m_lastRect{};
     const auto& io = ogi::getIo();
     bool show_demo_window{true};
     bool show_another_window{true};
@@ -107,15 +106,16 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         }
         ogi::win32::newFrame();
         auto clientRect = ogi::win32::getWindowClientRect(mainWindow);
-        const auto width = static_cast<int32_t>(clientRect.size.x);
-        const auto height = static_cast<int32_t>(clientRect.size.y);
-        if (width != m_lastWidth || height != m_lastHeight) {
-            m_lastWidth = width;
-            m_lastHeight = height;
+        if (clientRect != m_lastRect) {
+            m_lastRect = clientRect;
             ogi::requestFullRedraw();
         }
         ogi::newFrame();
         clientRect.pos = {};
+        //clientRect.size.x *= 0.5f;
+        //clientRect.size.y *= 0.5f;
+        //clientRect.pos.x = clientRect.size.x;
+        //clientRect.pos.y = clientRect.size.y;
         if (ogi::beginViewport("viewport", clientRect)) {
             if (show_demo_window) {
                 ogi::showDemoWindow(&show_demo_window);
@@ -134,7 +134,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
                     counter++;
                 }
                 ogi::sameRow();
-                // getHash is needed for have the same id for this widget since the text qui change frequently by interactions
+                // getHash is needed for have the same id for this widget since the text change frequently by button interactions
                 ogi::text(ogi::getHash("counter"), ogi::format("counter = %d", counter));
                 static bool show_fps{false};
                 ogi::checkBox("show fps (cause a redraw each frames)", &show_fps);
@@ -171,7 +171,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         ogi::render();
         if (ogi::hasPendingWork()) {
             ogi::wgl::makeCurrent(nullptr);  // nullptr = the main surface
-            glViewport(0, 0, width, height);
+            glViewport(clientRect.pos.x, clientRect.pos.y, clientRect.size.x, clientRect.size.y);
             glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
             glClear(GL_COLOR_BUFFER_BIT);
             // the renderer consumes and clears the context draw api
