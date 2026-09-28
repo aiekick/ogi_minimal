@@ -5,6 +5,8 @@ project(${PROJECT} LANGUAGES C CXX)
 
 set(SRC_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/vkContext.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/vkContext.h
 )
 source_group(main FILES ${SRC_SOURCES})
 

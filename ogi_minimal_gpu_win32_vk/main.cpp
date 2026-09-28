@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <iostream>
 
+#include "vkContext.h"  // the app vulkan context : volk first
+
 #include <ogi.h>
 #include <backends/ogi_win32.h>
 #include <backends/ogi_vulkan.h>
@@ -39,17 +41,6 @@ void updateHwm(const ogi::PlatformWindowHandle& aWindow) {
     }
 }
 
-// THE SURFACE SEAM : the renderer asks for a surface of ANY of the app
-// windows (the main one at init, a torn-off one when the plan targets it),
-// the window system answers — here a plain win32 window
-static VkResult createWin32Surface(VkInstance aInstance, ogi::PlatformWindowHandle aWindow, void* /*apUserData*/, VkSurfaceKHR* aoSurface) {
-    VkWin32SurfaceCreateInfoKHR surfaceInfo{};
-    surfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-    surfaceInfo.hinstance = GetModuleHandleW(nullptr);
-    surfaceInfo.hwnd = static_cast<HWND>(aWindow);
-    return vkCreateWin32SurfaceKHR(aInstance, &surfaceInfo, nullptr, aoSurface);
-}
-
 int WINAPI WinMain(HINSTANCE /*a_instance*/, HINSTANCE /*a_prev_instance*/, LPSTR /*a_cmd_line*/, int /*a_cmd_show*/) {
     auto mainWindow = ogi::win32::createAppWindow(s_app_name, 1280, 720);
     if (mainWindow == nullptr) {
@@ -71,16 +62,27 @@ int WINAPI WinMain(HINSTANCE /*a_instance*/, HINSTANCE /*a_prev_instance*/, LPST
         std::cout << "Fail to init win32 backend" << std::endl;
         return EXIT_FAILURE;
     }
-    // the instance extensions a win32 surface needs, and the seam making it
-    const char* const instanceExtensions[] = {VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
-    ogi::VulkanInitInfo initInfo;
-    initInfo.ppInstanceExtensions = instanceExtensions;
-    initInfo.instanceExtensionCount = 2u;
-    initInfo.pfnCreateSurface = &createWin32Surface;
-    initInfo.mainWindow = mainWindow;
+    // THE APP VULKAN CONTEXT : instance, device, swapchain, its pass and its
+    // frames in flight belong to the app, ogi only receives the handles
+    VkContext vkContext;
 #ifdef _DEBUG
-    initInfo.enableValidation = true;  // silently off without the sdk
+    const auto enableValidation = true;  // silently off without the sdk
+#else
+    const auto enableValidation = false;
 #endif
+    if (!vkContext.init(static_cast<HWND>(mainWindow), 2u, enableValidation)) {
+        std::cout << "Fail to create the vulkan context" << std::endl;
+        return EXIT_FAILURE;
+    }
+    ogi::VulkanInitInfo initInfo;
+    initInfo.instance = vkContext.getInstance();
+    initInfo.physicalDevice = vkContext.getPhysicalDevice();
+    initInfo.device = vkContext.getDevice();
+    initInfo.queueFamily = vkContext.getQueueFamily();
+    initInfo.queue = vkContext.getQueue();
+    initInfo.renderPass = vkContext.getRenderPass();
+    initInfo.framesInFlight = vkContext.getFramesInFlight();
+    initInfo.mainWindow = mainWindow;
     if (!vkRenderer.init(initInfo, true)) {
         std::cout << "Fail to init VULKAN renderer" << std::endl;
         return EXIT_FAILURE;
@@ -139,8 +141,8 @@ int WINAPI WinMain(HINSTANCE /*a_instance*/, HINSTANCE /*a_prev_instance*/, LPST
             if (show_another_window) {
                 if (ogi::beginWindow("Another window", &show_another_window)) {
                     ogi::text("Hello from another window!");
-                    ogi::text(ogi::getHash("vk.images"), ogi::format("swapchain images : %u", vkRenderer.getSwapchainImageCount()));
-                    ogi::text(ogi::getHash("vk.validation"), ogi::format("validation : %s", vkRenderer.isValidationOn() ? "on" : "off"));
+                    ogi::text(ogi::getHash("vk.images"), ogi::format("swapchain images : %u", vkContext.getSwapchainImageCount()));
+                    ogi::text(ogi::getHash("vk.validation"), ogi::format("validation : %s", vkContext.isValidationOn() ? "on" : "off"));
                     if (ogi::button("Close Me")) {
                         show_another_window = false;
                     }
@@ -151,10 +153,17 @@ int WINAPI WinMain(HINSTANCE /*a_instance*/, HINSTANCE /*a_prev_instance*/, LPST
         ogi::endViewport();
         ogi::render();
         if (ogi::hasPendingWork()) {
-            // the renderer owns the swapchain : it clears, paints the plan and
-            // presents, the app only says the color under the ui
-            vkRenderer.setClearColor(clear_color);
-            vkRenderer.render();
+            // THE APP FRAME : ogi caches before the pass, the scene (a clear
+            // here), the gui composed over it
+            const auto commandBuffer = vkContext.beginFrame();
+            if (commandBuffer != VK_NULL_HANDLE) {
+                vkRenderer.recordLayers(commandBuffer, vkContext.getExtent());
+                const float sceneColor[4] = {clear_color.x, clear_color.y, clear_color.z, clear_color.w};
+                vkContext.beginScenePass(sceneColor);
+                vkRenderer.recordComposite(commandBuffer);
+                vkContext.endScenePass();
+                vkContext.endFrame();
+            }
         }
         updateHwm(mainWindow);
     }
@@ -162,5 +171,6 @@ int WINAPI WinMain(HINSTANCE /*a_instance*/, HINSTANCE /*a_prev_instance*/, LPST
     vkRenderer.unit();
     ogi::win32::shutdown();
     ogi::destroyContext();
+    vkContext.unit();
     return EXIT_SUCCESS;
 }
