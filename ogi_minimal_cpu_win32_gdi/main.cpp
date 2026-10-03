@@ -82,7 +82,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         auto clientRect = ogi::win32::getWindowClientRect(mainWindow);
         const auto w = static_cast<int32_t>(clientRect.size.x);
         const auto h = static_cast<int32_t>(clientRect.size.y);
-        if (w != m_lastWidth || h != m_lastHeight) {
+        if ((w != m_lastWidth) || (h != m_lastHeight)) {
             m_lastWidth = w;
             m_lastHeight = h;
             ogi::requestFullRedraw();
