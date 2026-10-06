@@ -53,7 +53,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     int32_t m_lastHeight{};
     ogi::createContext();
     ogi::initDefaults();
-    ogi::themeDarkOrangeBlue();
+    ogi::useTheme("dark orange blue");
     m_platformApi.setWindowCreationEnabled(false);
     ogi::win32::setPlatformApi(&m_platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
