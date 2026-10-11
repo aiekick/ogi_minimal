@@ -11,22 +11,23 @@ set(SRC_SOURCES
 source_group(main FILES ${SRC_SOURCES})
 
 set(OGI_BACKENDS
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_win32.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_win32.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_vulkan.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_vulkan.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_vulkan_shaders.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_gpu.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_gpu.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_core.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_core.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_settings_file.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_settings_file.h
+	${OGI_ROOT_DIR}/backends/ogi_win32.cpp
+	${OGI_ROOT_DIR}/backends/ogi_win32.h
+	${OGI_ROOT_DIR}/backends/ogi_vulkan.cpp
+	${OGI_ROOT_DIR}/backends/ogi_vulkan.h
+	${OGI_ROOT_DIR}/backends/ogi_vulkan_shaders.h
+	${OGI_ROOT_DIR}/backends/ogi_draw_gpu.cpp
+	${OGI_ROOT_DIR}/backends/ogi_draw_gpu.h
+	${OGI_ROOT_DIR}/backends/ogi_skin_core.cpp
+	${OGI_ROOT_DIR}/backends/ogi_skin_core.h
+	${OGI_ROOT_DIR}/backends/ogi_settings_file.cpp
+	${OGI_ROOT_DIR}/backends/ogi_settings_file.h
 )
 source_group(backends FILES ${OGI_BACKENDS})
 
 add_executable(${PROJECT} WIN32 ${SRC_SOURCES} ${OGI_BACKENDS})
 target_include_directories(${PROJECT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # volk loads vulkan-1.dll at runtime : no vulkan library is linked
 target_link_libraries(${PROJECT} PRIVATE contrib ogi volk pdh)
 

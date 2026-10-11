@@ -9,24 +9,24 @@ set(SRC_SOURCES
 source_group(main FILES ${SRC_SOURCES})
 
 set(OGI_BACKENDS
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_win32.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_win32.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_wgl.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_wgl.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_opengl32.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_opengl32.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_gpu.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_gpu.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_core.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_core.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_settings_file.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_settings_file.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_nanovg.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_draw_nanovg.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_nanovg.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_skin_nanovg.h
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_nanovg.cpp
-	${CMAKE_SOURCE_DIR}/ogi/backends/ogi_nanovg.h
+	${OGI_ROOT_DIR}/backends/ogi_win32.cpp
+	${OGI_ROOT_DIR}/backends/ogi_win32.h
+	${OGI_ROOT_DIR}/backends/ogi_wgl.cpp
+	${OGI_ROOT_DIR}/backends/ogi_wgl.h
+	${OGI_ROOT_DIR}/backends/ogi_opengl32.cpp
+	${OGI_ROOT_DIR}/backends/ogi_opengl32.h
+	${OGI_ROOT_DIR}/backends/ogi_draw_gpu.cpp
+	${OGI_ROOT_DIR}/backends/ogi_draw_gpu.h
+	${OGI_ROOT_DIR}/backends/ogi_skin_core.cpp
+	${OGI_ROOT_DIR}/backends/ogi_skin_core.h
+	${OGI_ROOT_DIR}/backends/ogi_settings_file.cpp
+	${OGI_ROOT_DIR}/backends/ogi_settings_file.h
+	${OGI_ROOT_DIR}/backends/ogi_draw_nanovg.cpp
+	${OGI_ROOT_DIR}/backends/ogi_draw_nanovg.h
+	${OGI_ROOT_DIR}/backends/ogi_skin_nanovg.cpp
+	${OGI_ROOT_DIR}/backends/ogi_skin_nanovg.h
+	${OGI_ROOT_DIR}/backends/ogi_nanovg.cpp
+	${OGI_ROOT_DIR}/backends/ogi_nanovg.h
 )
 source_group(backends FILES ${OGI_BACKENDS})
 
