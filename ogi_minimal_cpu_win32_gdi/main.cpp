@@ -106,7 +106,8 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
                 }
                 ogi::sameRow();
                 ogi::text(ogi::getHash("counter"), ogi::format("counter = %d", counter));
-                ogi::text(ogi::getHash("framerate"), ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
+                ogi::text(ogi::getHash("framerate"),
+                    ogi::format("Application average %.3f ms/frame (%.1f FPS)", io.deltaTime, io.deltaTime * 1000.0f));
             }
             ogi::endWindow();
             if (show_another_window) {

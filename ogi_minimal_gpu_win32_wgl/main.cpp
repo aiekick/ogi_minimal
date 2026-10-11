@@ -50,8 +50,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     }
     // THE GL PAIRING : the context is born on the window to the asked
     // version and profile, then the loader resolves the entry points on it
-    if (!ogi::wgl::init(
-            mainWindow,  //
+    if (!ogi::wgl::init(mainWindow,  //
             ogi::wgl::ContextDesc(true, 3, 3, ogi::wgl::ContextDesc::SWAP_VSYNC))) {
         ogi::wgl::unit();
         return EXIT_FAILURE;
@@ -112,10 +111,10 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
         }
         ogi::newFrame();
         clientRect.pos = {};
-        //clientRect.size.x *= 0.5f;
-        //clientRect.size.y *= 0.5f;
-        //clientRect.pos.x = clientRect.size.x;
-        //clientRect.pos.y = clientRect.size.y;
+        // clientRect.size.x *= 0.5f;
+        // clientRect.size.y *= 0.5f;
+        // clientRect.pos.x = clientRect.size.x;
+        // clientRect.pos.y = clientRect.size.y;
         if (ogi::beginViewport("viewport", clientRect)) {
             if (show_demo_window) {
                 ogi::showDemoWindow(&show_demo_window);

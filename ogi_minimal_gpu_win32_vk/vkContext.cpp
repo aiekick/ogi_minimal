@@ -17,7 +17,7 @@ bool vkOk(VkResult aResult, const char* apWhat) {
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT aSeverity, VkDebugUtilsMessageTypeFlagsEXT,  //
-                                             const VkDebugUtilsMessengerCallbackDataEXT* apData, void*) {
+    const VkDebugUtilsMessengerCallbackDataEXT* apData, void*) {
     if ((aSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) && (apData != nullptr)) {
         std::cout << "vulkan validation : " << apData->pMessage << "\n";
     }
@@ -83,7 +83,8 @@ bool VkContext::m_createInstance(bool aEnableValidation) {
         VkDebugUtilsMessengerCreateInfoEXT debugInfo{};
         debugInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         debugInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        debugInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        debugInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
         debugInfo.pfnUserCallback = &debugCallback;
         vkCreateDebugUtilsMessengerEXT(m_instance, &debugInfo, nullptr, &m_debugMessenger);
     }
@@ -154,7 +155,8 @@ bool VkContext::m_pickDevice() {
     }
     m_surfaceFormat = formats[0];
     for (const auto& format : formats) {
-        if (((format.format == VK_FORMAT_B8G8R8A8_UNORM) || (format.format == VK_FORMAT_R8G8B8A8_UNORM)) && (format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)) {
+        if (((format.format == VK_FORMAT_B8G8R8A8_UNORM) || (format.format == VK_FORMAT_R8G8B8A8_UNORM)) &&
+            (format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)) {
             m_surfaceFormat = format;
             break;
         }
@@ -216,8 +218,8 @@ bool VkContext::m_createFrames(uint32_t aFramesInFlight) {
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;  // nothing in flight yet
-        if (!vkOk(vkAllocateCommandBuffers(m_device, &allocInfo, &frame.commandBuffer), "vkAllocateCommandBuffers")  //
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;                                                                 // nothing in flight yet
+        if (!vkOk(vkAllocateCommandBuffers(m_device, &allocInfo, &frame.commandBuffer), "vkAllocateCommandBuffers")     //
             || !vkOk(vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &frame.imageAvailable), "vkCreateSemaphore")  //
             || !vkOk(vkCreateFence(m_device, &fenceInfo, nullptr, &frame.inFlight), "vkCreateFence")) {
             return false;

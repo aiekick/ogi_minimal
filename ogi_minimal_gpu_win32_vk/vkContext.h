@@ -62,16 +62,36 @@ public:
     void endScenePass();
     void endFrame();
     // the handles a gui layer or a scene pipeline is built on
-    VkInstance getInstance() const { return m_instance; }
-    VkPhysicalDevice getPhysicalDevice() const { return m_physicalDevice; }
-    VkDevice getDevice() const { return m_device; }
-    uint32_t getQueueFamily() const { return m_queueFamily; }
-    VkQueue getQueue() const { return m_queue; }
-    VkRenderPass getRenderPass() const { return m_renderPass; }
-    VkExtent2D getExtent() const { return m_extent; }
-    uint32_t getFramesInFlight() const { return static_cast<uint32_t>(m_frames.size()); }
-    uint32_t getSwapchainImageCount() const { return static_cast<uint32_t>(m_views.size()); }
-    bool isValidationOn() const { return m_validationOn; }
+    VkInstance getInstance() const {
+        return m_instance;
+    }
+    VkPhysicalDevice getPhysicalDevice() const {
+        return m_physicalDevice;
+    }
+    VkDevice getDevice() const {
+        return m_device;
+    }
+    uint32_t getQueueFamily() const {
+        return m_queueFamily;
+    }
+    VkQueue getQueue() const {
+        return m_queue;
+    }
+    VkRenderPass getRenderPass() const {
+        return m_renderPass;
+    }
+    VkExtent2D getExtent() const {
+        return m_extent;
+    }
+    uint32_t getFramesInFlight() const {
+        return static_cast<uint32_t>(m_frames.size());
+    }
+    uint32_t getSwapchainImageCount() const {
+        return static_cast<uint32_t>(m_views.size());
+    }
+    bool isValidationOn() const {
+        return m_validationOn;
+    }
 
 private:
     bool m_createInstance(bool aEnableValidation);
