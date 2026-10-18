@@ -2,8 +2,8 @@ name: 'Build'
 
 # every host of the os the runner is, on every push : the ogi submodule and
 # the vendored contrib come with the checkout, the job only installs the
-# system libraries the linux hosts link (X11, EGL). the macos lane builds the
-# core and the contrib while its hosts are placeholders
+# system libraries the linux hosts link (X11, EGL) ; windows and macos have
+# theirs in the sdk
 on:
   push:
   workflow_dispatch:

@@ -13,9 +13,12 @@ nothing changes).
 | `ogi_minimal_gpu_win32_vk` | `ogi_win32` | `RendererVulkan`, over the app's own vulkan context |
 | `ogi_minimal_cpu_linux_x11` | `ogi_xlib` | `RendererX11`, the software rasterizer, no opengl |
 | `ogi_minimal_gpu_linux_xgl` | `ogi_xlib` + `ogi_lgl` (EGL) | `RendererGL` and `RendererNanoVg`, switchable live |
+| `ogi_minimal_gpu_macos_agl` | `ogi_cocoa` + `ogi_agl` (NSOpenGL) | `RendererGL` and `RendererNanoVg`, switchable live, at the retina resolution |
 
-The macos hosts (`ogi_minimal_cpu_macos_cocoa`, `ogi_minimal_gpu_macos_agl`)
-are placeholders : they configure, they build nothing yet.
+The cocoa backends are objective-c++ under ARC : the host compiles them
+with `-x objective-c++ -fobjc-arc`. The macos host shows no cpu / gpu load
+in its title (ezHwm has no macos sampler yet). `ogi_minimal_cpu_macos_cocoa`
+is a placeholder : it configures, it builds nothing yet.
 
 Every host follows the same order : the window, the gl context and its
 loader when there is one, the ogi context, the platform seam
@@ -31,7 +34,8 @@ volk with the vulkan headers (no sdk needed), and `ezHwm.hpp`, the cpu and
 gpu load shown in the window title.
 
 The system libraries are pulled by the host that needs them : `gdi32`
-and `opengl32` on windows, `X11` and `EGL` on linux. The linux gl host
+and `opengl32` on windows, `X11` and `EGL` on linux, the `Cocoa`, `Carbon`
+and `OpenGL` frameworks on macos. The linux gl host
 links no libGL : glad resolves every entry point on the egl context.
 
 ## Build
