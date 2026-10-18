@@ -32,13 +32,19 @@ source_group(backends FILES ${OGI_BACKENDS})
 
 # libX11 and libEGL are SYSTEM libraries pulled HERE, by the host app,
 # never by the ogi lib. no libGL : every gl entry point comes through glad,
-# resolved on the egl context
+# resolved on the egl context. libEGL is searched ALONE : FindOpenGL with its
+# EGL component also demands the glvnd libOpenGL, which this host never links
 find_package(X11 REQUIRED)
-find_package(OpenGL REQUIRED COMPONENTS EGL)
+find_library(OGI_MINIMAL_EGL_LIBRARY NAMES EGL)
+find_path(OGI_MINIMAL_EGL_INCLUDE_DIR NAMES EGL/egl.h)
+if(NOT OGI_MINIMAL_EGL_LIBRARY OR NOT OGI_MINIMAL_EGL_INCLUDE_DIR)
+	message(FATAL_ERROR "${PROJECT} needs libEGL and its headers (debian, ubuntu : apt install libegl-dev)")
+endif()
 
 add_executable(${PROJECT} ${SRC_SOURCES} ${OGI_BACKENDS})
 target_include_directories(${PROJECT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(${PROJECT} PRIVATE contrib ogi glad nanovg X11::X11 OpenGL::EGL ${CMAKE_DL_LIBS})
+target_link_libraries(${PROJECT} PRIVATE contrib ogi glad nanovg X11::X11 ${OGI_MINIMAL_EGL_LIBRARY} ${CMAKE_DL_LIBS})
+target_include_directories(${PROJECT} PRIVATE ${OGI_MINIMAL_EGL_INCLUDE_DIR})
 
 set_target_properties(${PROJECT} PROPERTIES
 	OUTPUT_NAME ${PROJECT}
