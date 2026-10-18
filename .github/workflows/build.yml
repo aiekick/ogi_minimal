@@ -1,0 +1,42 @@
+name: 'Build'
+
+# every host of the os the runner is, on every push : the ogi submodule and
+# the vendored contrib come with the checkout, the job only installs the
+# system libraries the linux hosts link (X11, EGL). the macos lane builds the
+# core and the contrib while its hosts are placeholders
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# one run per branch at a time ; a newer push supersedes an in-flight run
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install packages
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libegl-dev libgl-dev
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release -j 4
