@@ -57,7 +57,7 @@ int main(int /*argc*/, char** /*argv*/) {
     ogi::createContext();
     ogi::initDefaults();
     ogi::useTheme("dark orange blue");
-    ogi::xlib::setPlatformApi(&m_platformApi);
+    ogi::setPlatformApi(&m_platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
     ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
     ogi::loadSettings();

@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     ogi::initDefaults();
     ogi::useTheme("dark orange blue");
     m_platformApi.setWindowCreationEnabled(false);
-    ogi::win32::setPlatformApi(&m_platformApi);
+    ogi::setPlatformApi(&m_platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
     ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
     ogi::loadSettings();
