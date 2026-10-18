@@ -4,6 +4,10 @@ name: 'Build'
 # the vendored contrib come with the checkout, the job only installs the
 # system libraries the linux hosts link (X11, EGL) ; windows and macos have
 # theirs in the sdk
+#
+# requires, once : a secret PAT_SUBMODULES holding a token that can read the
+# private ogi submodule. The runner's own GITHUB_TOKEN never leaves this
+# repo, so the recursive checkout would stop at the first private submodule.
 on:
   push:
   workflow_dispatch:
@@ -28,6 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          token: ${{ secrets.PAT_SUBMODULES }}
 
       - name: Install packages
         if: runner.os == 'Linux'
