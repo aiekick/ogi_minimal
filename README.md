@@ -46,4 +46,8 @@ cmake -S . -B build
 cmake --build build
 ```
 
+The CI builds every host of linux, windows and macos at each push. The ogi
+submodule is private : the checkout reads it through a `PAT_SUBMODULES`
+secret, a token with read access to ogi.
+
 The executables land in `bin/`.
