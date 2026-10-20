@@ -48,7 +48,7 @@ int main(int /*argc*/, char** /*argv*/) {
     ogi::useTheme("dark orange blue");
     ogi::setPlatformApi(&platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
-    ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
+    ogi::setSettingsApi<ogi::SettingsApiFile>()->setFilePath("ogi.ini");
     ogi::loadSettings();
     if (!ogi::cocoa::init(mainWindow)) {
         std::cout << "Fail to init cocoa backend" << std::endl;

@@ -59,7 +59,7 @@ int main(int /*argc*/, char** /*argv*/) {
     ogi::useTheme("dark orange blue");
     ogi::setPlatformApi(&m_platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
-    ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
+    ogi::setSettingsApi<ogi::SettingsApiFile>()->setFilePath("ogi.ini");
     ogi::loadSettings();
     if (!ogi::xlib::init(mainWindow)) {
         std::cout << "Fail to init xlib backend" << std::endl;

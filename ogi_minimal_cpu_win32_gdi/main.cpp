@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE a_instance, HINSTANCE /*a_prev_instance*/, LPSTR /*
     m_platformApi.setWindowCreationEnabled(false);
     ogi::setPlatformApi(&m_platformApi);
     ogi::setPlatformWindowHandle(ogi::kMainPlatformWindowLabel, mainWindow);
-    ogi::setSettingsApi(new ogi::SettingsApiFile("ogi.ini"));
+    ogi::setSettingsApi<ogi::SettingsApiFile>()->setFilePath("ogi.ini");
     ogi::loadSettings();
     if (!ogi::win32::init(mainWindow)) {
         std::cout << "Fail to init win32 backend" << std::endl;
