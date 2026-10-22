@@ -16,6 +16,13 @@ if (NOT TARGET ogi)
     add_subdirectory(ogi)
 endif()
 
+# the linker pdbs of every app binary, one folder per config beside the
+# exes (set after ogi, so its suites keep their own)
+set(CMAKE_PDB_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/debug")
+set(CMAKE_PDB_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/release")
+set(CMAKE_PDB_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_SOURCE_DIR}/bin/minsizerel")
+set(CMAKE_PDB_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/bin/reldeb")
+
 if(WIN32)
     add_subdirectory(ogi_minimal_cpu_win32_gdi)
     add_subdirectory(ogi_minimal_gpu_win32_wgl)
