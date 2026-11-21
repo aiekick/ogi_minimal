@@ -1,0 +1,26 @@
+---
+Checks: >
+  -*,
+  clang-analyzer-*,
+  bugprone-*,
+  performance-*,
+  portability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  readability-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  -readability-magic-numbers,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-identifier-length,
+  -bugprone-easily-swappable-parameters,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic
+
+# Report warnings in project headers too, but not in 'old' folders
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: '.*/(old|build|archives)/.*'
+
+WarningsAsErrors: ''
+FormatStyle: none
+...
