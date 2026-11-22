@@ -27,8 +27,10 @@ the exit, the windowing backend last.
 
 ## Dependencies
 
-ogi comes as a submodule (`ogi/`) ; a parent project that already has the
-`ogi` target gives its own instead. Everything else is vendored in
+ogi is fetched by `cmake/ogiFetch.cmake` into the build tree
+(`_deps`), at the commit frozen in `OGI_FETCH_TAG` ; a parent project that already has the `ogi`
+target gives its own instead, and `-DOGI_ROOT_DIR=<path/ogi>` builds
+against another ogi checkout. Everything else is vendored in
 `contrib/` and extracted at configure time, no network : glad, nanovg,
 volk with the vulkan headers (no sdk needed), and `ezHwm.hpp`, the cpu and
 gpu load shown in the window title.
@@ -41,13 +43,10 @@ links no libGL : glad resolves every entry point on the egl context.
 ## Build
 
 ```
-git submodule update --init
 cmake -S . -B build
 cmake --build build
 ```
 
-The CI builds every host of linux, windows and macos at each push. The ogi
-submodule is private : the checkout reads it through a `PAT_SUBMODULES`
-secret, a token with read access to ogi.
+The CI builds every host of linux, windows and macos at each push.
 
 The executables land in `bin/`.

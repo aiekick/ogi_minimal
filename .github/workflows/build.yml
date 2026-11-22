@@ -1,13 +1,9 @@
 name: 'Build'
 
-# every host of the os the runner is, on every push : the ogi submodule and
-# the vendored contrib come with the checkout, the job only installs the
-# system libraries the linux hosts link (X11, EGL) ; windows and macos have
-# theirs in the sdk
-#
-# requires, once : a secret PAT_SUBMODULES holding a token that can read the
-# private ogi submodule. The runner's own GITHUB_TOKEN never leaves this
-# repo, so the recursive checkout would stop at the first private submodule.
+# every host of the os the runner is, on every push : the vendored contrib
+# comes with the checkout, ogi is fetched by the configure at its frozen
+# commit (cmake/ogiFetch.cmake), the job only installs the system libraries
+# the linux hosts link (X11, EGL) ; windows and macos have theirs in the sdk
 on:
   push:
   workflow_dispatch:
@@ -30,9 +26,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.PAT_SUBMODULES }}
 
       - name: Install packages
         if: runner.os == 'Linux'

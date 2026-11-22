@@ -12,9 +12,9 @@ set(BIN_DIR ${CMAKE_SOURCE_DIR}/bin)
 
 add_subdirectory(contrib)
 
-if (NOT TARGET ogi)
-    add_subdirectory(ogi)
-endif()
+# the core : the ogi target a parent project provides, else -DOGI_ROOT_DIR,
+# else the frozen commit fetched by cmake/ogiFetch.cmake
+include(cmake/ogiFetch.cmake)
 
 # the linker pdbs of every app binary, one folder per config beside the
 # exes (set after ogi, so its suites keep their own)
