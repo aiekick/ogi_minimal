@@ -6,18 +6,20 @@ Checks: >
   performance-*,
   portability-*,
   modernize-*,
-  cppcoreguidelines-*,
   readability-*,
+  cppcoreguidelines-init-variables,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-virtual-class-destructor,
+  cppcoreguidelines-special-member-functions,
+  cppcoreguidelines-prefer-member-initializer,
   -modernize-use-trailing-return-type,
   -modernize-use-nodiscard,
   -readability-magic-numbers,
-  -cppcoreguidelines-avoid-magic-numbers,
   -readability-identifier-length,
-  -bugprone-easily-swappable-parameters,
-  -cppcoreguidelines-pro-type-vararg,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic
+  -readability-uppercase-literal-suffix,
+  -bugprone-easily-swappable-parameters
 
-# Report warnings in project headers too, but not in 'old' folders
+# Report warnings in project headers too, but not in old/build/archives folders
 HeaderFilterRegex: '.*'
 ExcludeHeaderFilterRegex: '.*/(old|build|archives)/.*'
 
