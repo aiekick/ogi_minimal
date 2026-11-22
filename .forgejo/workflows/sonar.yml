@@ -9,6 +9,10 @@ on:
         description: "Branch to analyze"
         required: true
         default: master
+      lint_tests:
+        description: "clang-tidy also reads the tests folders (slow)"
+        type: boolean
+        default: false
 
 jobs:
   sonar:
@@ -25,6 +29,8 @@ jobs:
         run: git clone --depth 1 --branch master "https://oauth2:${CHECKOUT_TOKEN}@${GITHUB_SERVER_URL#*://}/${CI_REPO}.git" .ci
       - uses: ./.ci/sonar-prepare
       - uses: ./.ci/sonar-lint
+        with:
+          lint_tests: ${{ inputs.lint_tests || 'false' }}
       - uses: ./.ci/sonar-analyze
         with:
           branch: ${{ inputs.branch || '' }}
