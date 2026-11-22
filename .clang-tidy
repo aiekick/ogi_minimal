@@ -16,11 +16,30 @@ Checks: >
   -readability-magic-numbers,
   -readability-identifier-length,
   -readability-uppercase-literal-suffix,
-  -bugprone-easily-swappable-parameters
+  -bugprone-easily-swappable-parameters,
+  -performance-enum-size,
+  -modernize-avoid-c-arrays,
+  -modernize-use-using,
+  -modernize-type-traits,
+  -modernize-concat-nested-namespaces,
+  -modernize-macro-to-enum,
+  -modernize-return-braced-init-list,
+  -modernize-pass-by-value,
+  -readability-redundant-member-init,
+  -readability-redundant-access-specifiers,
+  -readability-isolate-declaration,
+  -readability-implicit-bool-conversion,
+  -readability-function-cognitive-complexity
 
-# Report warnings in project headers too, but not in old/build/archives folders
+# The style these choices follow:
+#   enum X : uint32_t, typedef uint32_t OgiXxxFlag, C arrays (no STL in the core), members always initialized {}
+#   C++11 for the libraries : no type traits _t/_v, no nested namespaces a::b
+#   class sections repeat their access specifiers, several declarations on a line, if (flags & X)
+#   config knobs are macros (overridable by -D), complexity is measured by Sonar
+
+# Report warnings in project headers too, never in vendored code nor generated or old folders
 HeaderFilterRegex: '.*'
-ExcludeHeaderFilterRegex: '.*/(old|build|archives)/.*'
+ExcludeHeaderFilterRegex: '.*/(old|build|archives|3rdparty|_deps)/.*'
 
 WarningsAsErrors: ''
 FormatStyle: none
