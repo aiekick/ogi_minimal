@@ -4,7 +4,7 @@
 # explicit -DOGI_ROOT_DIR=<path to ogi> is built ; otherwise the frozen commit
 # below is fetched into the build tree (_deps) ; and a missing core is refused
 # by name. moving to another ogi = changing OGI_FETCH_TAG
-set(OGI_FETCH_REPOSITORY "https://github.com/aiekick/ogi.git" CACHE STRING "the ogi repository fetched when neither the ogi target nor OGI_ROOT_DIR exist")
+set(OGI_FETCH_REPOSITORY "https://forge.funparadigm.com/ogi/ogi.git" CACHE STRING "the ogi repository fetched when neither the ogi target nor OGI_ROOT_DIR exist")
 set(OGI_FETCH_TAG "73911602b1123b8857b310280b52b915ff731d7e" CACHE STRING "the frozen commit of ogi fetched")
 
 if(NOT TARGET ogi)
