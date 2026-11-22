@@ -5,7 +5,6 @@ name: 'Build'
 # commit (cmake/ogiFetch.cmake), the job only installs the system libraries
 # the linux hosts link (X11, EGL) ; windows and macos have theirs in the sdk
 on:
-  push:
   workflow_dispatch:
 
 permissions:
